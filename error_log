@@ -1,0 +1,4 @@
+[24-Jul-2016 15:17:19 UTC] PHP Fatal error:  Class 'App\client' not found in /home/everestcleaning/public_html/app/Http/Controllers/ClientController.php on line 16
+[24-Jul-2016 15:17:26 UTC] PHP Fatal error:  Class 'App\client' not found in /home/everestcleaning/public_html/app/Http/Controllers/ClientController.php on line 16
+[24-Jul-2016 15:17:57 UTC] PHP Fatal error:  Class 'App\client' not found in /home/everestcleaning/public_html/app/Http/Controllers/ClientController.php on line 16
+[24-Jul-2016 15:19:00 UTC] PHP Fatal error:  Class 'App\client' not found in /home/everestcleaning/public_html/app/Http/Controllers/ClientController.php on line 16

@@ -1,0 +1,201 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Apr 18, 2016, 5:22:41 PM
+    Author     : Jon
+*/
+
+/* html tab*/
+body{
+    background:#fdfbfb;
+    color:#222 !important;
+}
+
+a:hover{
+    text-decoration: none;
+}
+
+a,button,img,input{
+    outline:none !important;
+}
+
+/* margin padding */
+.margintop20{
+    margin-top:30px;
+}
+
+.display-inline{
+    display:inline-block;
+}
+
+/* reset setting*/
+.navbar{
+    margin-bottom:0 !important;
+}
+
+.nav-sidebar li{
+    border-bottom: #ddd solid 1px;
+}
+.nav-sidebar li a{
+    color:#102c53;
+}
+.nav-sidebar li i{
+    margin-right:10px;
+    color:#98c43d;
+}
+.nav-sidebar li ul li{
+    list-style-type:none;
+}
+
+.nav-sidebar li ul li a{
+   display:block;
+   padding: 10px 15px;
+   text-decoration: none;
+}
+
+.nav-sidebar li ul li a:hover{
+    background:#eee;
+}
+.get_levy{
+    display:none;
+}
+
+/* left menu */
+.left-menu-wrapper{
+    background:#e7e7e7;
+    padding:20px;
+    min-height: 500px;
+}
+
+/* main wrapper */
+
+.content_wrapper{
+   
+}
+.payroll_generate_wrapper{
+    margin-top:50px;
+    padding:20px;
+}
+
+.content_wrapper .btn-primary{
+    background:#102c53;
+    border:#102c53 solid 1px;
+}
+
+.content_wrapper .btn-info{
+    background:#999;
+    border:#999 solid 1px;
+}
+
+.content_wrapper h2{
+    font-size:20px;
+    color:#102c53;
+    display:inline-block;
+    border-bottom:#98c43d solid 1px;
+    padding-bottom: 10px;
+}
+
+.content_wrapper h3{
+    font-size:18px;
+    color:#102c53;
+    background:#eee;
+    padding:10px;
+    padding-bottom: 10px;
+}
+/*login form*/
+.ev_login_form_wrapper{
+     margin-top:40px;
+}
+
+.ev_login_form_wrapper .panel-default{
+    padding:50px 20px 20px 20px;
+    border:solid 1px #102c53;
+    background:#eee;
+}
+
+.ev_login_form_wrapper .btn-primary{
+    background:#102c53;
+    border:#102c53 solid 1px;
+}
+
+/* button */
+.create_btn{
+    background:#98c43d;
+    padding:10px;
+    color:#222;
+    border-radius:3px;
+    display:inline-block;
+    margin-top:10px;
+    margin-left:20px;
+}
+.create_btn i{
+    margin-left:5px;
+}
+
+.em_btn_back{
+    margin-left:10px;
+    color:#102c53;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.em_btn_back:hover{
+    color:green;
+    text-decoration: underline;
+    padding-bottom:5px;
+}
+
+.em_btn_back_onlystyle{
+    margin-left:10px;
+    color:#102c53;
+    text-decoration: underline;
+    font-weight: bold;
+    margin-top:10px;
+}
+
+.em_btn_back_onlystyle:hover{
+    color:green;
+    text-decoration: underline;
+    padding-bottom:5px;
+}
+
+.help-block{
+    color:red;
+}
+
+.em_veiw_mode input{
+    text-transform: capitalize;
+}
+
+.show_guide_label{
+    color:#3c763d;
+    font-size:1.1rem;
+}
+.add_redcolor{
+    color:red;
+}
+
+/* footer*/
+
+.footer{
+    display:block;
+    background:#102c53;
+    padding:10px;
+    color:#fff;
+    margin-top:100px;
+    width:100%;
+}
+
+.fix-footer{
+    position:fixed;
+    bottom:0;
+}
+
+@media (max-width:480px){
+    .nav-sidebar{
+        
+    }
+}
