@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('content')   
+<link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="../js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+<script type="text/javascript" src="../js/locales/bootstrap-datetimepicker.fr.js" charset="UTF-8"></script>
         <div class="col-sm-9 col-md-9 content_wrapper">
 	    <h2 class="sub-header">Add invoice</h2>
 	    <div class="pull-right" style="margin-top:20px;">			
@@ -8,10 +11,11 @@
         <form class="form-horizontal" role="form" method="POST" action="{{ url('/invoice/save') }}">
         {!! csrf_field() !!}
 
+		<input type="hidden" name="invoice_id" id="invoice_id" value="<?php echo $invoice_id ?>" />
 		<div class="form-group">
 		    <label class="col-md-4 control-label">Invoice No<span class="add_redcolor">*</span></label>
 		    <div class="col-md-4">
-			<input type="text" class="form-control" name="invoice_no" value="{{ old('invoice_no') }}">
+			<input type="text" class="form-control" name="invoice_no" value="{{ old('invoice_no') }}" readonly id="INV_no">
 			@if ($errors->has('invoice_no'))
 			    <span class="help-block">
 				<strong>{{ $errors->first('invoice_no') }}</strong>
@@ -22,7 +26,7 @@
 		<div class="form-group">
 		    <label class="col-md-4 control-label">Date<span class="add_redcolor">*</span></label>
 		    <div class="col-md-4">
-			<input type="text" class="form-control" name="invoice_date" value="{{ old('invoice_date') }}">
+			<input type="text" class="form-control form_date" id="invoice_date" name="invoice_date" value="{{ date('Y-m-d') }}" data-format="yyyy-MM-dd" readonly >
 			@if ($errors->has('invoice_date'))
 			    <span class="help-block">
 				<strong>{{ $errors->first('invoice_date') }}</strong>
@@ -33,7 +37,7 @@
 		<div class="form-group">
 		    <label class="col-md-4 control-label">Client<span class="add_redcolor">*</span></label>
 		    <div class="col-md-4">
-				<select class="form-control" name="client_id">
+				<select class="form-control" name="client_id" id="INV_client_id">
 				    <option value="">Client</option>
 				   	 @foreach($client as $value)
 				    <option value="<?php echo $value->id; ?>"><?php echo $value->cli_com_name; ?></option>
@@ -44,10 +48,10 @@
 		<div class="form-group">
 		    <label class="col-md-4 control-label">Project<span class="add_redcolor">*</span></label>
 		    <div class="col-md-4">
-				<select class="form-control" name="project_id">
-				    <option value="">Project</option>
+				<select class="form-control" name="project_id" id="INV_project_id">
+				    <option class="show" value="">Project</option>
 				   	 @foreach($project as $value)
-				    <option value="<?php echo $value->id; ?>"><?php echo $value->project_name; ?></option>
+				    <option class="<?php echo $value->client_id; ?>" id="<?php echo $value->project_shortname_for_invoice; ?>" value="<?php echo $value->id; ?>"><?php echo $value->project_name; ?></option>
 				     @endforeach
 				</select>	
 		    </div>
@@ -98,5 +102,12 @@
 		</div>
 		</form>
 </div>
-     
+<script>
+$('.form_date').datetimepicker({               
+	format: 'yyyy-mm-dd',
+	startView: 'month',
+	minView: 'month',
+	autoclose: true   
+});		  
+</script>     
 @endsection

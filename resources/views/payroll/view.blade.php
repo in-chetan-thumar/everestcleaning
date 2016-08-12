@@ -39,7 +39,19 @@
 			<div class="form-group">
 			    <label class="col-md-5 control-label"> Remark</label>
 			    <div class="col-md-7">
-				<textarea class="form-control" readonly value="{{ $payroll->remark }}"></textarea>		
+				<textarea class="form-control" readonly>{{ $payroll->remark }}</textarea>		
+			    </div>
+			</div>
+			<div class="form-group">
+			    <label class="col-md-5 control-label"> Cheque no</label>
+			    <div class="col-md-7">
+				<input type="text" class="form-control" name="cheque_no" value="{{ $payroll->cheque_no }}" readonly>
+			    </div>
+			</div>
+			<div class="form-group">
+			    <label class="col-md-5 control-label"> Agency</label>
+			    <div class="col-md-7">
+				<label class="col-md-5 control-label"> {{ $agency_name }} </label>
 			    </div>
 			</div>
 		    </div>

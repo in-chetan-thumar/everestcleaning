@@ -52,6 +52,14 @@ Route::get('/cpf/edit/{id}',array('before' => 'auth','uses'=>'CPFsettingControll
 Route::post('/cpf/edit',array('before' => 'auth','uses'=>'CPFsettingController@cpf_editsave'));
 Route::post('/cpf/delete',array('before' => 'auth','uses'=>'CPFsettingController@cpf_delete'));
 
+Route::get('/sdl',array('before' => 'auth','uses'=>'SdlsettingController@sdl_list'));
+Route::get('/sdl/create',array('before' => 'auth','uses'=>'SdlsettingController@sdl_create'));
+Route::post('/sdl/save',array('before' => 'auth','uses'=>'SdlsettingController@sdl_save'));
+Route::get('/sdl/list',array('before' => 'auth','uses'=>'SdlsettingController@sdl_list'));
+Route::get('/sdl/edit/{id}',array('before' => 'auth','uses'=>'SdlsettingController@sdl_edit'));
+Route::post('/sdl/edit',array('before' => 'auth','uses'=>'SdlsettingController@sdl_editsave'));
+Route::get('/sdl/delete/{id}',array('before' => 'auth','uses'=>'SdlsettingController@sdl_delete'));
+
 Route::get('/payroll/list',array('before' => 'auth','uses'=>'PayrollsettingController@proll_list'));
 Route::get('/payroll/create',array('before' => 'auth','uses'=>'PayrollsettingController@proll_create'));
 Route::post('/payroll/save',array('before' => 'auth','uses'=>'PayrollsettingController@proll_save'));
@@ -136,7 +144,31 @@ Route::post('/invoice/save',array('before' => 'auth','uses'=>'InvoiceController@
 Route::get('/invoice/list',array('before' => 'auth','uses'=>'InvoiceController@invoice_list'));
 Route::get('/invoice/edit/{id}',array('before' => 'auth','uses'=>'InvoiceController@invoice_edit'));
 Route::post('/invoice/edit',array('before' => 'auth','uses'=>'InvoiceController@invoice_editsave'));
-Route::post('/invoice/delete',array('before' => 'auth','uses'=>'InvoiceController@invoice_delete'));
+Route::get('/invoice/delete/{id}',array('before' => 'auth','uses'=>'InvoiceController@invoice_delete'));
 
+Route::get('/quotation',array('before' => 'auth','uses'=>'QuotationController@quotation_list'));
+Route::get('/quotation/create',array('before' => 'auth','uses'=>'QuotationController@quotation_create'));
+Route::post('/quotation/save',array('before' => 'auth','uses'=>'QuotationController@quotation_save'));
+Route::get('/quotation/list',array('before' => 'auth','uses'=>'QuotationController@quotation_list'));
+Route::get('/quotation/edit/{id}',array('before' => 'auth','uses'=>'QuotationController@quotation_edit'));
+Route::post('/quotation/edit',array('before' => 'auth','uses'=>'QuotationController@quotation_editsave'));
+Route::get('/quotation/delete/{id}',array('before' => 'auth','uses'=>'QuotationController@quotation_delete'));
 
+Route::get('/letterhead',array('before' => 'auth','uses'=>'LetterheadController@letterhead_list'));
+Route::get('/letterhead/create',array('before' => 'auth','uses'=>'LetterheadController@letterhead_create'));
+Route::post('/letterhead/save',array('before' => 'auth','uses'=>'LetterheadController@letterhead_save'));
+Route::get('/letterhead/list',array('before' => 'auth','uses'=>'LetterheadController@letterhead_list'));
+Route::get('/letterhead/edit/{id}',array('before' => 'auth','uses'=>'LetterheadController@letterhead_edit'));
+Route::post('/letterhead/edit',array('before' => 'auth','uses'=>'LetterheadController@letterhead_editsave'));
+Route::get('/letterhead/delete/{id}',array('before' => 'auth','uses'=>'LetterheadController@letterhead_delete'));
 
+Route::match(['get','post'],'/schedule',array('before' => 'auth','uses'=>'ScheduleController@schedule_show'));
+Route::get('/schedule/scheduleemployeelist',array('before' => 'auth','uses'=>'ScheduleController@schedule_employee_list'));
+Route::match(['get','post'],'/schedule/delete/{id}',array('before' => 'auth','uses'=>'ScheduleController@schedule_delete'));
+
+Route::match(['get','post'],'/reports',array('before' => 'auth','uses'=>'ReportsController@reports_show'));
+Route::get('/reports/export/{type}/{project_id}/{month}/{year}',array('before' => 'auth','uses'=>'ReportsController@reports_export'));
+
+Route::get('/leave',array('before' => 'auth','uses'=>'LeaveController@leave_list'));
+Route::post('/leave/create',array('before' => 'auth','uses'=>'LeaveController@leave_create'));
+Route::get('/leave/validate',array('before' => 'auth','uses'=>'LeaveController@leave_validate'));

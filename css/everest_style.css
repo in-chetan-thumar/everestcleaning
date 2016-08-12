@@ -199,3 +199,11 @@ a,button,img,input{
         
     }
 }
+
+#create_schedule_popup .fa.fa-times,#create_schedule_popup .fa-minus,#create_schedule_popup .fa-plus {
+  cursor: pointer;
+}
+#schedule_table td{
+	padding: 5px;
+	line-height: 30px;
+}

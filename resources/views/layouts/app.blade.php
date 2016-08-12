@@ -25,6 +25,8 @@ if (Auth::check())
      <link href="{!! asset('css/everest_style.css') !!}" media="all" rel="stylesheet" type="text/css" />
      <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css" rel="stylesheet">
     
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	
     <style>
         body {
             font-family: 'Lato';
@@ -80,7 +82,7 @@ if (Auth::check())
 		<a href="{{ url('/user/'.Auth::user()->id) }}"><i class="fa fa-user" aria-hidden="true"></i>My Profile</a>
 		@endif
 		@if(in_array(13,$log_id))
-		<a href="{{ url('/user') }}"><i class="fa fa-users" aria-hidden="true"></i> User List</a>
+		<a href="{{ url('/user') }}"><i class="fa fa-users" aria-hidden="true"></i> Employee List</a>
 		@endif
 	    </li>
             <li>
@@ -109,6 +111,9 @@ if (Auth::check())
 			<li>
 			    <a href="{{ url('/cpf') }}" class>CPF</a>
 			</li>
+			<li>
+			    <a href="{{ url('/sdl') }}" class>SDL</a>
+			</li>
 			 <li>
 			    <a href="{{ url('/agency') }}">Agency</a>
 			</li>
@@ -136,9 +141,14 @@ if (Auth::check())
 		<a href="{{ url('/userrole')}}"><i class="fa fa-user" aria-hidden="true"></i> User Role</a>
 		@endif
         @if(in_array(9,$log_id))
-        <a href="{{ url('/client')}}"><i class="fa fa-user" aria-hidden="true"></i> Client</a>
-        <a href="{{ url('/project')}}"><i class="fa fa-file" aria-hidden="true"></i> Project</a>
-        <a href="{{ url('/invoice')}}"><i class="fa fa-file" aria-hidden="true"></i> Invoice</a>
+			<a href="{{ url('/client')}}"><i class="fa fa-user" aria-hidden="true"></i> Client</a>
+			<a href="{{ url('/project')}}"><i class="fa fa-file" aria-hidden="true"></i> Project</a>
+			<a href="{{ url('/invoice')}}"><i class="fa fa-file" aria-hidden="true"></i> Invoice</a>
+			<a href="{{ url('/quotation')}}"><i class="fa fa-file" aria-hidden="true"></i> Quotation</a>
+			<a href="{{ url('/letterhead')}}"><i class="fa fa-file" aria-hidden="true"></i> Contract/Letterhead</a>
+			<a href="{{ url('/schedule')}}"><i class="fa fa-file" aria-hidden="true"></i> Monthly schedule</a>
+			<a href="{{ url('/reports')}}"><i class="fa fa-file" aria-hidden="true"></i> Reports</a>
+			<a href="{{ url('/leave')}}"><i class="fa fa-file" aria-hidden="true"></i> leaves</a>
         @endif
 		</li>
           </ul>
@@ -152,13 +162,15 @@ if (Auth::check())
     </footer>
     
     <!-- JavaScripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    
+	
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
     <script src="{!! asset('js/custom.js') !!}"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.js"></script>
      <!-- include summernote css/js-->
+	
     
      <script>
         $(document).ready(function() {

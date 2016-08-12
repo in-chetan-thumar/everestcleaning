@@ -13,6 +13,9 @@ use DateTime;
 use DB;
 use App;
 use App\Workshift;
+use App\Agency;
+use App\Sdlsetting;
+use App\Leave;
 
 class PayrollsettingController extends Controller
 {
@@ -49,12 +52,20 @@ class PayrollsettingController extends Controller
 	foreach($getalluser as $value){
 	    $pay = new Payrollsetting();
 	    $pay->user_id = $value->id;
-	    $pay->basic_salary = $value->salary;	
+		$pay->agency_id = $value->agency;
+	    $pay->basic_salary = $value->salary;
 	    $getdays = Workshift::where('id',$value->time_shift)->first();
 	    $pay->working_days = $getdays->total_working_days;
 	    $pay->actual_working_days= $getdays->total_working_days;
-	    $pay->paid_leave = 0;
-	    $pay->unpaid_leave = 0;
+		
+		$startDate = $request->y_payday."-".$request->m_payday."-01";
+		$endDate = $request->y_payday."-".$request->m_payday."-31";
+		$employeeLeave = Leave::where('employee_id', '=', $value->id)->whereBetween('date', array($startDate, $endDate))
+			->Select(DB::raw('SUM(IF(is_paid = "Y", 1,0)) AS tot_paid_leave, SUM(IF(is_paid = "N", 1,0)) AS tot_unpaid_leave'))->first();
+		
+	    $pay->paid_leave = is_null($employeeLeave->tot_paid_leave) ? 0 : $employeeLeave->tot_paid_leave;
+		$pay->unpaid_leave = is_null($employeeLeave->tot_unpaid_leave) ? 0 : $employeeLeave->tot_unpaid_leave;
+			
 	    if($value->levy_status != 0){
 		$levy_val = $value->levy_val;
 	    }
@@ -67,7 +78,8 @@ class PayrollsettingController extends Controller
 	    $pay->misc = 0;
 	    $pay->commission = 0;
 	    $pay->allowances = 0;
-	    if($value->salary < 800){
+	    
+		/*if($value->salary < 800){
 		$sdl_val = 2;
 	    }
 	    else if($value->salary > 800 && 2000 > $value->salary ){		
@@ -76,8 +88,11 @@ class PayrollsettingController extends Controller
 	    else{
 		$sdl_val = 11.25;
 	    }
-	    
-	    $pay->sdl = $sdl_val;
+		$pay->sdl = $sdl_val;*/
+		
+		$sdlsetting = Sdlsetting::where('total_wages', '<=', $value->salary)->orderBy('total_wages', 'DESC')->first();
+		
+	    $pay->sdl = $sdlsetting->sdl_payable;		
 	    $user_dob = $value->dob;
             $udate = new DateTime($user_dob);
 	    $current_date = new DateTime();
@@ -115,6 +130,7 @@ class PayrollsettingController extends Controller
     
     public function proll_editsave(Request $request){
 	
+	
 	$keep_proll = Payrollsetting::find($request->id);
 	$keep_proll->working_days   = $request->working_days;
 	$keep_proll->unpaid_leave   = $request->unpaid_leave;
@@ -128,6 +144,7 @@ class PayrollsettingController extends Controller
 	$keep_proll->employer_cpf   = $request->employer_cpf;
 	$keep_proll->employee_cpf   = $request->employee_cpf;
 	$keep_proll->remark	    = $request->remark;
+	$keep_proll->cheque_no	    = $request->cheque_no;
 	$keep_proll->actual_working_days = $request->working_days - $request->unpaid_leave;
 	$keep_proll->total_salary   = $request->total_salary;
 	$keep_proll->created_at        = date('Y-m-d H:i:s');
@@ -139,8 +156,13 @@ class PayrollsettingController extends Controller
     }
     
     public function proll_edit(Request $request){
-	$payroll = Payrollsetting::find($request->id);
-	return view('payroll.edit',['payroll' => $payroll]);
+		$payroll = Payrollsetting::find($request->id);
+		$agency_name = "";
+		if(!is_null($payroll->agency_id)){
+			$agency = Agency::find($payroll->agency_id);
+			$agency_name = $agency->agency_name;
+		}
+	return view('payroll.edit',['payroll' => $payroll, 'agency_name' => $agency_name]);
     }
     
      public function proll_search(Request $request){	
@@ -184,8 +206,13 @@ class PayrollsettingController extends Controller
      } 
      
      public function proll_view(Request $request){
-	$payroll = Payrollsetting::find($request->id);
-	return view('payroll.view',['payroll' => $payroll]);
+		$payroll = Payrollsetting::find($request->id);
+		$agency_name = "";
+		if(!is_null($payroll->agency_id)){
+			$agency = Agency::find($payroll->agency_id);
+			$agency_name = $agency->agency_name;
+		}
+	return view('payroll.view',['payroll' => $payroll, 'agency_name' => $agency_name]);
     }
     
     public function generate_pdf(Request $request){
@@ -212,6 +239,13 @@ class PayrollsettingController extends Controller
 	$overtime= $getuser_proll->ot;
 	$levy = $getuser_proll->levy;
 	$housing  = $getuser->housing_fee;
+	$remark = $getuser_proll->remark;
+	$cheque_no = $getuser_proll->cheque_no;
+	$agency_name = "";
+	if(!is_null($getuser_proll->agency_id)){
+		$agency = Agency::find($getuser_proll->agency_id);
+		$agency_name = $agency->agency_name;
+	}
 	$total_contribution = $levy + $housing;
 	if($housing == ""){
 	    $housing = "-";
@@ -353,7 +387,8 @@ class PayrollsettingController extends Controller
 					
 					<tr><td class="add_border1">						
 						<div class=row_style><span class="txt_label">NAME</span><span class="dot">:</span><span class="txt_label1 name_style">'.$name.'</span><span style=display:inline-block;width:45px></span><span class="txt_label">PERIOD</span><span class="dot">:</span><span class="txt_label3">'.$gettime.'</span></div>
-						<div class=row_style><span class="txt_label">DESIGNATION</span><span class="dot">:</span><span class="txt_label1 name_style">'.$designation.'</span></div>	
+						<div class=row_style><span class="txt_label">DESIGNATION</span><span class="dot">:</span><span class="txt_label1 name_style">'.$designation.'</span><span style=display:inline-block;width:45px></span><span class="txt_label">AGENCY</span><span class="dot">:</span><span class="txt_label3">'.$agency_name.'</span></div>	
+						<div class=row_style><span class="txt_label">Cheque no</span><span class="dot">:</span><span class="txt_label1 name_style">'.$cheque_no.'</span></div>
 					</td><td>
 					</tr>
 					<tr><td>
@@ -383,6 +418,12 @@ class PayrollsettingController extends Controller
 
 						</table>
 					</tr></td>
+					<tr>
+							<td class="add_border1" style="border-bottom:1px solid #000;">
+								<div class=row_style><span class="txt_label">Remark</span><span class="dot"></span><span class="txt_label1 name_style"></span><span style=display:inline-block;width:45px></span><span class="txt_label"></span><span class="dot"></span><span style="width:200px">employee signature</span></div>
+								<div class=row_style><span class="txt_label" style="width:400px; text-transform:non;"> '.$remark.'</span></div>
+							</td>
+						</tr>
 				</table>
 			    </div>
 				</div>
@@ -393,7 +434,8 @@ class PayrollsettingController extends Controller
     	$pdf->loadHTML($html);
 		return $pdf->download($pdf_name);
     }
-       public function print_pdf(Request $request){
+       
+	public function print_pdf(Request $request){
 	  $getuser_proll = Payrollsetting::find($request->id);
 	   
 	$pdf = App::make('dompdf.wrapper');
@@ -417,6 +459,13 @@ class PayrollsettingController extends Controller
 	$overtime= $getuser_proll->ot;
 	$levy = $getuser_proll->levy;
 	$housing  = $getuser->housing_fee;
+	$remark = $getuser_proll->remark;
+	$cheque_no = $getuser_proll->cheque_no;
+	$agency_name = "";
+	if(!is_null($getuser_proll->agency_id)){
+		$agency = Agency::find($getuser_proll->agency_id);
+		$agency_name = $agency->agency_name;
+	}
 	$total_contribution = $levy + $housing;
 	if($housing == ""){
 	    $housing = "-";
@@ -553,42 +602,54 @@ class PayrollsettingController extends Controller
 				<div class="nobreak">
 					<div class="wrapper">
 					<table border="0" cellpadding="0" cellspacing="0" class="addwidthx72">
-					<tr><td><img src="'.$path.'/images/everest-logo.png" width="250px"/></td></tr>
-					<tr><td><h1>PAYSLIP</h1></td></tr>
+						<tr><td><img src="'.$path.'/images/everest-logo.png" width="250px"/></td></tr>
+						<tr><td><h1>PAYSLIP</h1></td></tr>
 					
-					<tr><td class="add_border1">						
-						<div class=row_style><span class="txt_label">NAME</span><span class="dot">:</span><span class="txt_label1 name_style">'.$name.'</span><span style=display:inline-block;width:45px></span><span class="txt_label">PERIOD</span><span class="dot">:</span><span class="txt_label3">'.$gettime.'</span></div>
-						<div class=row_style><span class="txt_label">DESIGNATION</span><span class="dot">:</span><span class="txt_label1 name_style">'.$designation.'</span></div>	
-					</td><td>
-					</tr>
-					<tr><td>
-						<table border="0" cellpadding="0" cellspacing="0" class="addwidthx72">
-							<tr><td class="add_border" style="width:330px;">
-								<div class=row_style><span class="txt_label2">Basic Pay</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$basicpay.'</span></div>
-								<div class=row_style>	<span class="txt_label2">Overtime</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$overtime.'</span></div>
-								<div class=row_style><span class="txt_label2">Commission</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$commission.'</span></div>
-								<div class=row_style><span class="txt_label2">Allowances</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$allowances.'</span></div>
-								
-								<div class=net_total><span class="txt_label2 ">Gross Pay</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$grosspay.'</span></div>
-							</td>
-							</td><td class="add_border" style="width:330px">						    
-								<div class=row_style><span class="txt_label2">Unpaid Leave</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$unpaidleave.'</span></div>
-								<div class=row_style style="height:150px">&nbsp;</div>
-								
-								<div class=net_total row_style><span class="txt_label2">Total decduction</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$total_deduction.'</span></div>
-						    </td></tr>		
-						    <tr><td class="add_border" style="width:330px;">
-								'.$cpforlevy.'						
-							</td>
-							</td><td class="add_border" style="width:330px">							   
-								<div style="height:100px">&nbsp;</div>
-								<div class=net_total row_style><span class="txt_label2 ">Net Total</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$nettotal.'</span></div>
-								<div style="height:30px">&nbsp;</div>
-						    </td></tr>	
-
+						<tr><td class="add_border1">						
+							<div class=row_style><span class="txt_label">NAME</span><span class="dot">:</span><span class="txt_label1 name_style">'.$name.'</span><span style=display:inline-block;width:45px></span><span class="txt_label">PERIOD</span><span class="dot">:</span><span class="txt_label3">'.$gettime.'</span></div>
+							<div class=row_style><span class="txt_label">DESIGNATION</span><span class="dot">:</span><span class="txt_label1 name_style">'.$designation.'</span><span style=display:inline-block;width:45px></span><span class="txt_label">AGENCY</span><span class="dot">:</span><span class="txt_label3">'.$agency_name.'</span></div>	
+							<div class=row_style><span class="txt_label">Cheque no</span><span class="dot">:</span><span class="txt_label1 name_style">'.$cheque_no.'</span></div>
+						</td></tr>
+						
+						<tr>
+						<td>
+							<table border="0" cellpadding="0" cellspacing="0" class="addwidthx72">
+								<tr>
+									<td class="add_border" style="width:330px;">
+										<div class=row_style><span class="txt_label2">Basic Pay</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$basicpay.'</span></div>
+										<div class=row_style>	<span class="txt_label2">Overtime</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$overtime.'</span></div>
+										<div class=row_style><span class="txt_label2">Commission</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$commission.'</span></div>
+										<div class=row_style><span class="txt_label2">Allowances</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$allowances.'</span></div>
+									
+										<div class=net_total><span class="txt_label2 ">Gross Pay</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$grosspay.'</span></div>
+									</td>
+									<td class="add_border" style="width:330px">						    
+										<div class=row_style><span class="txt_label2">Unpaid Leave</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$unpaidleave.'</span></div>
+										<div class=row_style style="height:150px">&nbsp;</div>
+									
+										<div class=net_total row_style><span class="txt_label2">Total decduction</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$total_deduction.'</span></div>
+									</td>
+								</tr>		
+								<tr>
+									<td class="add_border" style="width:330px;">
+										'.$cpforlevy.'						
+									</td>
+									<td class="add_border" style="width:330px">							   
+										<div style="height:100px">&nbsp;</div>
+										<div class=net_total row_style><span class="txt_label2 ">Net Total</span><span class="leave_days1">&nbsp;</span><span class="txt_value">'.$nettotal.'</span></div>
+										<div style="height:30px">&nbsp;</div>
+									</td>
+								</tr>
 						</table>
-					</tr></td>
-				</table>
+						</td>
+						</tr>
+						<tr>
+							<td class="add_border1" style="border-bottom:1px solid #000;">
+								<div class=row_style><span class="txt_label">Remark</span><span class="dot"></span><span class="txt_label1 name_style"></span><span style=display:inline-block;width:45px></span><span class="txt_label"></span><span class="dot"></span><span style="width:200px">employee signature</span></div>
+								<div class=row_style><span class="txt_label" style="width:400px; text-transform:non;"> '.$remark.'</span></div>
+							</td>
+						</tr>						
+					</table>
 			    </div>
 				</div>
 				</body>
